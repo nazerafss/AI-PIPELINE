@@ -1,0 +1,46 @@
+{
+  "name": "Ingrid",
+  "age": 11,
+  "gender": "girl",
+  "native_language": "Swedish",
+  "english_level": "A1-A2",
+  "personality": "shy, perfectionist, anxious",
+  "attention_span": "long but needs silence to think",
+  "background": {
+    "family": "Both parents, younger brother. Father often away.",
+    "interests": ["cats", "drawing", "nature docs", "reading"],
+    "english_exposure": "school only, no media in English"
+  },
+  "triggers": {
+    "engages_when": [
+      "question is simple and has one right answer",
+      "teacher waits patiently after asking",
+      "topic involves animals or art",
+      "teacher speaks slowly and clearly",
+      "environment feels private and safe"
+    ],
+    "shuts_down_when": [
+      "called on suddenly without warning",
+      "question is open-ended or opinion-based",
+      "teacher corrects her mid-sentence",
+      "teacher speaks too fast",
+      "other students are watching"
+    ]
+  },
+  "language_patterns": {
+    "typical_errors": [
+      "omits articles (she says 'I have cat' not 'I have a cat')",
+      "present simple for everything (no past tense)",
+      "whispers Swedish word before attempting English",
+      "very literal translation from Swedish structure"
+    ],
+    "vocabulary_ceiling": "~300 high-frequency words",
+    "response_style": [
+      "1-4 word answers when nervous",
+      "longer if she has prepared or written first",
+      "long silences before responding (5-10 seconds)",
+      "says 'I don't understand' not 'I don't know'"
+    ]
+  },
+  "behavioral_notes": "Will not guess. Needs to feel correct before speaking. If made to feel stupid, goes completely silent for the rest of session. Responds well to being asked to write before speak."
+}
