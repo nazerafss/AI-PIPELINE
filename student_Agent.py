@@ -70,19 +70,16 @@ class StudentSession:
         messages = self._build_messages(teacher_input)
     
         USE_REAL_MODEL = os.getenv("USE_REAL_MODEL", "false") == "true"
-    
         if USE_REAL_MODEL:
-            response = ollama.chat(
-                model=self.model,
+            from groq import Groq
+            client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+            response = client.chat.completions.create(
+                model="llama3-8b-8192",
                 messages=messages,
-                options={
-                    "temperature": 0.7,
-                    "top_p": 0.9,
-                    "repeat_penalty": 1.1,
-                    "num_predict": 256,
-                }
+                temperature=0.7,
+                max_tokens=256,
             )
-            student_reply = response["message"]["content"].strip()
+            student_reply = response.choices[0].message.content.strip()
         else:
             # ✅ CI SAFE MODE
             student_reply = "Mock student response (CI pipeline)"
