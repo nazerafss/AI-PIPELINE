@@ -10,12 +10,12 @@ TEST_QUESTIONS = [
 ]
 
 MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
-    "gemma2-9b-it",
-    "mixtral-8x7b-32768",
-    "qwen-qwq-32b",
-    "llama3-8b-8192",
+    "llama3.2",
+    "mistral",
+    "phi4-mini",
+    "gemma3:4b",
+    "qwen2.5:3b",
+    "gemma4:2b",
 ]
 
 def run():
