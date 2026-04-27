@@ -16,10 +16,10 @@ def run():
     system_prompt = build_system_prompt(global_behavior, persona)
 
     session = StudentSession(
-        model="llama3.2",
-        system_prompt=system_prompt,
-        persona=persona
-    )
+    model="llama3.2",
+    system_prompt=system_prompt,
+    persona_name=persona.get("name", "Student")
+)
 
     results = []
 
