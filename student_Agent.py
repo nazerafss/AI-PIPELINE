@@ -2,11 +2,11 @@ import json
 import os
 from pathlib import Path
 
-import ollama
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()   # loads .env if present (for any future secrets)
-
+_groq_client = Groq() 
 
 # ── 1. Loaders ────────────────────────────────────────────────────────────────
 
@@ -66,18 +66,14 @@ class StudentSession:
     def send(self, teacher_input: str) -> str:
         messages = self._build_messages(teacher_input)
 
-        response = ollama.chat(
+        response = _groq_client.chat.completions.create(
             model=self.model,
             messages=messages,
-            options={
-                "temperature": 0.7,
-                "top_p": 0.9,
-                "repeat_penalty": 1.1,
-                "num_predict": 256,
-            }
-        )
-
-        student_reply = response["message"]["content"].strip()
+            temperature=0.7,
+            top_p=0.9,
+            max_tokens=256,
+)
+        student_reply = response.choices[0].message.content.strip()
 
         # Persist turn for multi-turn memory
         self.history.append({"role": "user",      "content": teacher_input})
