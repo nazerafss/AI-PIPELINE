@@ -9,27 +9,36 @@ TEST_QUESTIONS = [
     "Explain more"
 ]
 
+MODELS = [
+    "llama-3.1-8b-instant",
+    "mistral-7b-instruct",
+    "gemma2-9b-it",
+    "qwen-qwq-32b",
+    "llama-3.3-70b-versatile",
+    "gemma-7b-it",
+]
+
 def run():
     persona = load_persona("personas/ingrid.json")
     global_behavior = load_global_behavior()
-
     system_prompt = build_system_prompt(global_behavior, persona)
-
-    session = StudentSession(
-    model="llama3.2",
-    system_prompt=system_prompt,
-    persona_name=persona.get("name", "Student")
-)
 
     results = []
 
-    for q in TEST_QUESTIONS:
-        response = session.send(q)
+    for model in MODELS:
+        session = StudentSession(
+            model=model,
+            system_prompt=system_prompt,
+            persona_name=persona.get("name", "Student")
+        )
 
-        results.append({
-            "question": q,
-            "response": response
-        })
+        for q in TEST_QUESTIONS:
+            response = session.send(q)
+            results.append({
+                "model": model,
+                "question": q,
+                "response": response
+            })
 
     pd.DataFrame(results).to_csv("results/results.csv", index=False)
 
