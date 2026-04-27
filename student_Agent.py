@@ -51,12 +51,11 @@ Embody every detail above. The lesson is starting now.
 # ── 2. Chat session ───────────────────────────────────────────────────────────
 
 class StudentSession:
-    def __init__(self, model, system_prompt, persona):
-        self.model = model
+    def __init__(self, model: str, system_prompt: str, persona_name: str):
+        self.model         = model
         self.system_prompt = system_prompt
-        self.persona = persona
-        self.persona_name = persona.get("name", "Student")
-        self.history = []
+        self.persona_name  = persona_name
+        self.history       = []   # list of {"role": ..., "content": ...}
 
     def _build_messages(self, teacher_input: str) -> list:
         messages = [{"role": "system", "content": self.system_prompt}]
@@ -65,29 +64,25 @@ class StudentSession:
         return messages
 
     def send(self, teacher_input: str) -> str:
-        import os
-    
         messages = self._build_messages(teacher_input)
-    
-        USE_REAL_MODEL = os.getenv("USE_REAL_MODEL", "false") == "true"
-        if USE_REAL_MODEL:
-            from groq import Groq
-            client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=256,
-            )
-            student_reply = response.choices[0].message.content.strip()
-        else:
-            # ✅ CI SAFE MODE
-            student_reply = "Mock student response (CI pipeline)"
-    
-        # Save memory
-        self.history.append({"role": "user", "content": teacher_input})
-        self.history.append({"role": "assistant", "content": student_reply})
-    
+
+        response = ollama.chat(
+            model=self.model,
+            messages=messages,
+            options={
+                "temperature": 0.7,
+                "top_p": 0.9,
+                "repeat_penalty": 1.1,
+                "num_predict": 256,
+            }
+        )
+
+        student_reply = response["message"]["content"].strip()
+
+        # Persist turn for multi-turn memory
+        self.history.append({"role": "user",      "content": teacher_input})
+        self.history.append({"role": "assistant",  "content": student_reply})
+
         return student_reply
 
     def reset(self):
@@ -111,17 +106,25 @@ def main():
 
     # ── Model choice ──
     print("\nChoose model (must be pulled via ollama first):")
-    print("  1 → llama3.2:1b   (~1GB  — fastest)")
-    print("  2 → llama3.2      (~2GB  — recommended)")
-    print("  3 → llama3.1:8b   (~5GB  — best quality)")
-    choice = input("Enter 1 / 2 / 3 (default 2): ").strip() or "2"
+    print("  1 → llama3.2 ")
+    print("  2 → mistral ")
+    print("  3 → phi4-mini")
+    print("  4 → gemma4:e2b")
+    print("  5 → qwen2.5:3b")
+    print("  6 → gemma3:4b")
+    choice = input("Enter (default 1): ").strip() or "1"
+
 
     model_map = {
-        "1": "llama3.2:1b",
-        "2": "llama3.2",
-        "3": "llama3.1:8b",
+        "1": "llama3.2",
+        "2": "mistral",
+        "3": "phi4-mini",
+        "4": "gemma4:e2b",
+        "5": "qwen2.5:3b",
+        "6": "gemma3:4b",    
     }
-    model = model_map.get(choice, model_map["2"])
+
+    model = model_map.get(choice, model_map["1"])
 
     # ── Build system prompt ──
     global_behavior = load_global_behavior(global_behavior_file)
@@ -133,7 +136,7 @@ def main():
     print(f"✅ Behavior : {global_behavior_file}\n")
 
     # ── Start session ──
-    session = StudentSession(model, system_prompt, persona)
+    session = StudentSession(model, system_prompt, persona.get("name", "Student"))
 
     print(f"🏫 Session started with {persona.get('name')}.")
     print("Commands: 'quit' | 'reset' (clear history) | 'swap' (change persona)\n")
@@ -158,7 +161,7 @@ def main():
             new_file      = input("Path to new persona JSON: ").strip()
             persona       = load_persona(new_file)
             system_prompt = build_system_prompt(global_behavior, persona)
-            session = StudentSession(model, system_prompt, persona)
+            session       = StudentSession(model, system_prompt, persona.get("name", "Student"))
             print(f"✅ Swapped to: {persona.get('name')}\n")
             continue
 
